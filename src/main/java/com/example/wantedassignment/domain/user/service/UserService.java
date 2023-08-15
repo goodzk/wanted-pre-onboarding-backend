@@ -44,6 +44,14 @@ public class UserService implements UserDetailsService {
         return new CustomUserDetails(userEntity);
     }
 
+    public void matchPassword(final String email, final String password) {
+        User userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
+        if(!passwordEncoder.matches(password, userEntity.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException(email + "이 존재하지 않습니다."));
