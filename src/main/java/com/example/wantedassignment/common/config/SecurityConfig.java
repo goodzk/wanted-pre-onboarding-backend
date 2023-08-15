@@ -1,6 +1,7 @@
 package com.example.wantedassignment.common.config;
 
 import com.example.wantedassignment.common.filter.CustomAuthenticationFilter;
+import com.example.wantedassignment.common.filter.FilterExceptionHandler;
 import com.example.wantedassignment.domain.user.service.RefreshTokenService;
 import com.example.wantedassignment.domain.user.service.UserService;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .headers().frameOptions().disable()
                 .and()
+                .addFilterBefore(new FilterExceptionHandler(), UsernamePasswordAuthenticationFilter.class)
                 .addFilter(getAuthenticationFilter())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

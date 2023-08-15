@@ -80,14 +80,24 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             throws AuthenticationException {
         try {
             LoginUser creds = new ObjectMapper().readValue(request.getInputStream(), LoginUser.class);
+            checkValidation(creds);
             UserDetails user = userService.loadUserByUsername(creds.getEmail());
-            log.info(user.getUsername());
+            userService.matchPassword(creds.getEmail(), creds.getPassword());
             return getAuthenticationManager()
                     .authenticate(
                     new UsernamePasswordAuthenticationToken(user, creds.getPassword(), user.getAuthorities())
             );
         } catch (Exception e) {
             throw new RuntimeException("[ERROR] LOGIN FAIL", e);
+        }
+    }
+
+    private void checkValidation(final LoginUser user) {
+        if (!user.getEmail().contains("@")) {
+            throw new RuntimeException("유효하지 않은 이메일 입니다.");
+        }
+        if (user.getPassword().length() < 8) {
+            throw new RuntimeException("비밀번호의 길이가 너무 짧습니다.");
         }
     }
 }
