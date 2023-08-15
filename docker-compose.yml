@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+  community:
+    container_name: community-be
+    build:
+      dockerfile: Dockerfile
+    environment:
+      - spring.redis.host=community-redis
+    ports:
+      - "8080:8080"
+    depends_on:
+      community-redis:
+        condition: service_healthy
+      community-mysql:
+        condition: service_healthy
+    restart: always
+    networks:
+      - community-network
+
+  community-mysql:
+    container_name: community-mysql
+    image: mysql:8.1
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      TZ: Asia/Seoul
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - community-network
+
+  community-redis:
+    container_name: community-redis
+    image: redis:alpine
+    command: redis-server --port 6379
+    hostname: redis_boot
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - "6379:6379"
+    networks:
+      - community-network
+
+networks:
+  community-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
+          gateway: 172.18.0.1
