@@ -48,4 +48,16 @@ class UserServiceTest {
         // then
         assertThat(join.isSuccess()).isTrue();
     }
+
+    @Test
+    void getUserByEmail() {
+        // given
+        final String email = "test@gmail.com";
+
+        // when
+        final String savedEmail = userService.getUserByEmail(email).getEmail();
+
+        // then
+        assertThat(email).isEqualTo(savedEmail);
+    }
 }
