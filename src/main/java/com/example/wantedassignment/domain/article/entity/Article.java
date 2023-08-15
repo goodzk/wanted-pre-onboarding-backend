@@ -23,16 +23,16 @@ public class Article extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String body;
 
     @Column(nullable = false, updatable = false)
     private Long userId;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, length = 10)
     private String username;
 
     @Builder
